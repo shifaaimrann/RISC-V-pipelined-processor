@@ -7,12 +7,12 @@ module Data_Memory(
     input MemRead,
     output reg [63:0] Read_Data
 );
-reg [7:0] data_memory [63:0];
+reg [7:0] data_memory [511:0]; //changing thsi to accomadate for 512 bytes
 //data memory is 128 memory locations, each of 1 byte, whihc is 8 bits
 //assigning random values
 genvar i;
 generate
-    for(i=0;i<64;i=i+1) begin:gen_block
+    for(i=0;i<512;i=i+1) begin:gen_block
         initial data_memory[i]=i+1;
     end
 endgenerate
