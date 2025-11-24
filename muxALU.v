@@ -5,6 +5,7 @@ module muxALU(
     input [63:0] b,//64 bit input
     input[3:0] ALUop,//selector
     output reg Zero,//zero to check whether result is zero or not
+    output reg blt,
     output reg [63:0] result//64 bit output
     );
 
@@ -37,5 +38,6 @@ else begin
     result = 64'dx; 
 end
  Zero=(result==64'b0);//assigning Zero based on if result is equal to 64 bits of zeroes
+ blt = ($signed(a) < $signed(b));
 end
 endmodule
