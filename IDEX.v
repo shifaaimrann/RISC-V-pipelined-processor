@@ -1,8 +1,29 @@
 `timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 24.11.2025 20:16:12
+// Design Name: 
+// Module Name: IDEX
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
 
 module ID_EX(
     input clk,
     input reset,
+    input flush,   //flush signal to insert bubble (NOP) into EX stage
 
     // Control signals from ID
     input Branch,  //taking all contorl signals as input from the decode stage //if branch instruction
@@ -65,7 +86,29 @@ always @(posedge clk or posedge reset) begin
         IDEX_Rd        <= 5'd0;
 
         // Clear datapath values
-        IDEX_PCout    <= 64'd0;
+        IDEX_PCout     <= 64'd0;
+        IDEX_ReadData1 <= 64'd0;
+        IDEX_ReadData2 <= 64'd0;
+        IDEX_Imm       <= 64'd0;
+    end
+    else if (flush) begin  //if flush is high, insert a bubble/NOP into EX stage
+        // Clear control signals
+        IDEX_Branch    <= 1'b0;
+        IDEX_MemRead   <= 1'b0;
+        IDEX_MemWrite  <= 1'b0;
+        IDEX_MemtoReg  <= 1'b0;
+        IDEX_RegWrite  <= 1'b0;
+        IDEX_ALUSrc    <= 1'b0;
+        IDEX_ALUOp     <= 2'b00;
+
+        // Clear instruction fields
+        IDEX_Funct     <= 4'b0000;
+        IDEX_Rs1       <= 5'd0;
+        IDEX_Rs2       <= 5'd0;
+        IDEX_Rd        <= 5'd0;
+
+        // Clear datapath values
+        IDEX_PCout     <= 64'd0;
         IDEX_ReadData1 <= 64'd0;
         IDEX_ReadData2 <= 64'd0;
         IDEX_Imm       <= 64'd0;
@@ -87,7 +130,7 @@ always @(posedge clk or posedge reset) begin
         IDEX_Rd        <= Rd;
         
         // datapath values
-        IDEX_PCout    <= IFID_PCout;
+        IDEX_PCout     <= IFID_PCout;
         IDEX_ReadData1 <= ReadData1;
         IDEX_ReadData2 <= ReadData2;
         IDEX_Imm       <= Imm;
