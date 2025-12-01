@@ -261,7 +261,6 @@ module riscv_top(
     wire [63:0] PCBranch_EX;
     assign PCBranch_EX = IDEX_PCout + IDEX_Imm;
 
-    // ==========================
     // EX/MEM PIPELINE REGISTER
     wire        EXMEM_Branch;
     wire        EXMEM_MemRead;
