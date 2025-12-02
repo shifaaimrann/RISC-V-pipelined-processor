@@ -1,0 +1,41 @@
+`timescale 1ns / 1ps
+
+module IFID_tb();
+reg clk;
+reg reset;
+reg flush;
+reg [31:0] Instruction;   //instruction into IFID
+reg [63:0] PC_Out;         //pc into IFID
+
+wire [31:0] IFID_Instruction;
+wire [63:0] IFID_PCout;
+
+// IFID module
+IFID f1(clk,reset,flush,Instruction,PC_Out,IFID_Instruction,IFID_PCout);
+
+initial begin
+    clk = 1'b0;
+    reset = 1'b0;
+    flush = 1'b0;
+    Instruction = 0;
+    PC_Out = 0;
+
+    #10 reset = 1'b1;    //apply reset
+    #10 reset = 1'b0;    //reset off
+
+    // using your instructions
+    #10 Instruction = 32'h10000413; PC_Out = 64'h00000010;   // addi x8, x0, 256
+    #10 Instruction = 32'h00542023; PC_Out = 64'h00000014;   // sw x5, 0(x8)
+
+    #10 flush = 1'b1;    //flush clears IFID
+    #10 flush = 1'b0;
+
+    // more instructions from your list
+    #10 Instruction = 32'h00c00293; PC_Out = 64'h00000018;   // addi x5, x0, 12
+    #10 Instruction = 32'h00542223; PC_Out = 64'h0000001C;   // sw x5, 4(x8)
+end
+
+// clock toggle
+always #10 clk = ~clk;
+
+endmodule

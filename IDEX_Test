@@ -1,0 +1,185 @@
+`timescale 1ns / 1ps
+
+module ID_EX_tb();
+reg clk;
+reg reset;
+reg flush;
+
+reg Branch;
+reg MemRead;
+reg MemWrite;
+reg MemtoReg;
+reg RegWrite;
+reg ALUSrc;
+reg [1:0] ALUOp;
+
+reg [3:0] Funct;      //alu control code
+reg [4:0] Rs1;        //source register 1
+reg [4:0] Rs2;        //source register 2
+reg [4:0] Rd;         //destination register
+
+reg [63:0] IFID_PCout;   //pc going into EX
+reg [63:0] ReadData1;    //rs1 data
+reg [63:0] ReadData2;    //rs2 data
+reg [63:0] Imm;          //immediate value
+
+wire IDEX_Branch;
+wire IDEX_MemRead;
+wire IDEX_MemWrite;
+wire IDEX_MemtoReg;
+wire IDEX_RegWrite;
+wire IDEX_ALUSrc;
+wire [1:0] IDEX_ALUOp;
+
+wire [3:0]  IDEX_Funct;
+wire [4:0]  IDEX_Rs1;
+wire [4:0]  IDEX_Rs2;
+wire [4:0]  IDEX_Rd;
+
+wire [63:0] IDEX_PCout;
+wire [63:0] IDEX_ReadData1;
+wire [63:0] IDEX_ReadData2;
+wire [63:0] IDEX_Imm;
+
+//creating the ID_EX pipeline register
+ID_EX e1(
+    clk,
+    reset,
+    flush,
+    Branch,
+    MemRead,
+    MemWrite,
+    MemtoReg,
+    RegWrite,
+    ALUSrc,
+    ALUOp,
+    Funct,
+    Rs1,
+    Rs2,
+    Rd,
+    IFID_PCout,
+    ReadData1,
+    ReadData2,
+    Imm,
+    IDEX_Branch,
+    IDEX_MemRead,
+    IDEX_MemWrite,
+    IDEX_MemtoReg,
+    IDEX_RegWrite,
+    IDEX_ALUSrc,
+    IDEX_ALUOp,
+    IDEX_Funct,
+    IDEX_Rs1,
+    IDEX_Rs2,
+    IDEX_Rd,
+    IDEX_PCout,
+    IDEX_ReadData1,
+    IDEX_ReadData2,
+    IDEX_Imm
+);
+
+initial begin
+    //initial values
+    clk = 1'b0;
+    reset = 1'b0;
+    flush = 1'b0;
+
+    Branch = 1'b0;
+    MemRead = 1'b0;
+    MemWrite = 1'b0;
+    MemtoReg = 1'b0;
+    RegWrite = 1'b0;
+    ALUSrc = 1'b0;
+    ALUOp = 2'b00;
+
+    Funct = 4'b0000;
+    Rs1 = 5'd0;
+    Rs2 = 5'd0;
+    Rd  = 5'd0;
+
+    IFID_PCout = 64'd0;
+    ReadData1  = 64'd0;
+    ReadData2  = 64'd0;
+    Imm        = 64'd0;
+
+    //apply reset
+    #10 reset = 1'b1;
+    #10 reset = 1'b0;
+
+    // --------------------------------------------------
+    // sample instruction: 32'h10000413  (addi x8,x0,0x100)
+    // --------------------------------------------------
+    // control signals for addi (I-type)
+    #10;
+    Branch   = 1'b0;
+    MemRead  = 1'b0;
+    MemWrite = 1'b0;
+    MemtoReg = 1'b0;
+    RegWrite = 1'b1;      //write back enabled
+    ALUSrc   = 1'b1;      //use immediate
+    ALUOp    = 2'b00;     //addi treated like normal add
+
+    Funct    = 4'b0000;   //simple add
+    Rs1      = 5'd0;      //x0
+    Rs2      = 5'd0;      //not used
+    Rd       = 5'd8;      //x8
+
+    IFID_PCout = 64'h00000010;
+    ReadData1  = 64'd0;        //x0 = 0
+    ReadData2  = 64'd0;
+    Imm        = 64'h00000100; //0x100
+
+    // --------------------------------------------------
+    // sample instruction: 32'h00542023  (sw x5,0(x8))
+    // --------------------------------------------------
+    #20;
+    Branch   = 1'b0;
+    MemRead  = 1'b0;
+    MemWrite = 1'b1;      //store word
+    MemtoReg = 1'b0;
+    RegWrite = 1'b0;      //no write-back
+    ALUSrc   = 1'b1;      //base + imm
+    ALUOp    = 2'b01;     //can treat as store operation
+
+    Funct    = 4'b0000;   //address add
+    Rs1      = 5'd8;      //base register x8
+    Rs2      = 5'd5;      //data register x5
+    Rd       = 5'd0;      //not used
+
+    IFID_PCout = 64'h00000014;
+    ReadData1  = 64'd256; //assume x8 = 256
+    ReadData2  = 64'd5;   //assume x5 = 5
+    Imm        = 64'd0;   //offset 0
+
+    // --------------------------------------------------
+    // apply flush to insert bubble in EX
+    // --------------------------------------------------
+    #20 flush = 1'b1;
+    #10 flush = 1'b0;
+
+    // another addi after flush (using 32'h00c00293 -> addi x5,x0,12)
+    #10;
+    Branch   = 1'b0;
+    MemRead  = 1'b0;
+    MemWrite = 1'b0;
+    MemtoReg = 1'b0;
+    RegWrite = 1'b1;
+    ALUSrc   = 1'b1;
+    ALUOp    = 2'b00;
+
+    Funct    = 4'b0000;
+    Rs1      = 5'd0;      //x0
+    Rs2      = 5'd0;
+    Rd       = 5'd5;      //x5
+
+    IFID_PCout = 64'h00000018;
+    ReadData1  = 64'd0;
+    ReadData2  = 64'd0;
+    Imm        = 64'd12;
+
+end
+
+//clock generation
+always #10 clk = ~clk;
+
+endmodule
