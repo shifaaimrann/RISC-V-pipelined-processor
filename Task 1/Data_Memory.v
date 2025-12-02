@@ -1,52 +1,49 @@
 `timescale 1ns/1ps
 
 module Data_Memory(
-    input [63:0] Mem_Addr,      // memory address (byte-addressable)
-    input [63:0] Write_Data,    // data to write
-    input clk,                  // clock
-    input MemWrite,             // memory write enable
-    input MemRead,              // memory read enable
-    output reg [63:0] Read_Data // data read from memory
+    input [63:0] Mem_Addr,
+    input [31:0] Write_Data,
+    input clk,
+    input MemWrite,
+    input MemRead,
+    output reg [31:0] Read_Data
 );
 
-    // 512 bytes of memory, 1 byte each
-    reg [7:0] data_memory [511:0]; 
+    reg [7:0] data_memory [511:0];
 
-    // initializing memory with values for simulation
-    genvar i;
-    generate
-        for(i=0; i<512; i=i+1) begin: gen_block
-            initial data_memory[i] = i+1;
-        end
-    endgenerate
+    integer k;
+    initial begin
+        for(k=0; k<512; k=k+1)
+            data_memory[k] = 8'h00;
 
-    // safe memory address (0-504) for 64-bit aligned access
-    wire [8:0] addr = (Mem_Addr > 504) ? 9'd504 : Mem_Addr[8:0]; 
+        //array initialization [5, 2, 9, 1, 7, 4, 3] at 0x100 (256)
+            data_memory[256] = 8'h05; data_memory[257] = 8'h00; data_memory[258] = 8'h00; data_memory[259] = 8'h00;
+            data_memory[260] = 8'h02; data_memory[261] = 8'h00; data_memory[262] = 8'h00; data_memory[263] = 8'h00;
+            data_memory[264] = 8'h09; data_memory[265] = 8'h00; data_memory[266] = 8'h00; data_memory[267] = 8'h00;
+            data_memory[268] = 8'h01; data_memory[269] = 8'h00; data_memory[270] = 8'h00; data_memory[271] = 8'h00;
+            data_memory[272] = 8'h07; data_memory[273] = 8'h00; data_memory[274] = 8'h00; data_memory[275] = 8'h00;
+            data_memory[276] = 8'h04; data_memory[277] = 8'h00; data_memory[278] = 8'h00; data_memory[279] = 8'h00;
+            data_memory[280] = 8'h03; data_memory[281] = 8'h00; data_memory[282] = 8'h00; data_memory[283] = 8'h00;
+    end
+    
+    wire [8:0] addr = (Mem_Addr[8:0] > 508) ? 9'd508 : Mem_Addr[8:0];
 
-    // combinational read
     always @(*) begin
         if(MemRead) begin
-            // reading 8 consecutive bytes to make 64-bit data
-            Read_Data = {data_memory[addr+7], data_memory[addr+6], data_memory[addr+5], data_memory[addr+4],
-                         data_memory[addr+3], data_memory[addr+2], data_memory[addr+1], data_memory[addr]};
+            Read_Data = {data_memory[addr+3], data_memory[addr+2], data_memory[addr+1], data_memory[addr]};
         end else begin
-            Read_Data = 64'dx; // undefined when not reading
+            Read_Data = 32'd0;
         end
     end
 
-    // sequential write
     always @(posedge clk) begin
-    if(MemWrite) begin
-        // Use <= for sequential writes
-        data_memory[addr]   <= Write_Data[7:0];
-        data_memory[addr+1] <= Write_Data[15:8];
-        data_memory[addr+2] <= Write_Data[23:16];
-        data_memory[addr+3] <= Write_Data[31:24];
-        data_memory[addr+4] <= Write_Data[39:32];
-        data_memory[addr+5] <= Write_Data[47:40];
-        data_memory[addr+6] <= Write_Data[55:48];
-        data_memory[addr+7] <= Write_Data[63:56];
+        if(MemWrite) begin
+            data_memory[addr]   <= Write_Data[7:0];
+            data_memory[addr+1] <= Write_Data[15:8];
+            data_memory[addr+2] <= Write_Data[23:16];
+            data_memory[addr+3] <= Write_Data[31:24];
+        end
     end
-end
 
 endmodule
+
