@@ -202,9 +202,6 @@ module PipelinedRISCV(
         .EXMEM_ALUResult(mem_alu_result), .EXMEM_WriteData(mem_write_data), .EXMEM_Rd(mem_rd)
     );
 
-    // =================================================================
-    // 7. MEM STAGE
-    // =================================================================
     
     // data memory access
     Data_Memory dmem(
@@ -231,3 +228,4 @@ module PipelinedRISCV(
     mux wb_mux(wb_memtoreg, wb_alu_result, wb_read_data, wb_final_write_data);
 
 endmodule
+
