@@ -33,10 +33,8 @@ module EX_MEM(
     output reg [63:0] EXMEM_PCBranch,
     output reg        EXMEM_ZeroFlag,
     
-    // --- NEW OUTPUTS ---
     output reg        EXMEM_bltflag, // Output BLT flag to MEM stage
     output reg [3:0]  EXMEM_funct,   // Output Funct to MEM stage
-    // -------------------
 
     output reg [63:0] EXMEM_ALUResult,
     output reg [63:0] EXMEM_WriteData,
@@ -84,3 +82,4 @@ end
 
 
 endmodule
+
