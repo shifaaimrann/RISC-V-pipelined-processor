@@ -11,8 +11,9 @@ module Program_Counter(
 
     always @ (posedge clk or posedge reset) begin
         if (reset == 1'b1) 
-            PC_Out <= 64'b0; // Use Non-Blocking <=
+            PC_Out <= 64'b0; // Using non blocking
         else 
-            PC_Out <= PC_In; // Use Non-Blocking <=
+            PC_Out <= PC_In; 
     end
+
 endmodule
