@@ -17,7 +17,7 @@ module ALU_Control(
                 endcase
             end
 
-            2'b01: // Branch types - use funct3 to select ALU behavior
+            2'b01: // Branch types - using funct3 to select ALU behavior
             begin
                 case(Funct[2:0]) // funct3
                     3'b000: Operation = 4'b0110; // BEQ -> SUB (check Zero)
@@ -42,4 +42,5 @@ module ALU_Control(
             default: Operation = 4'bxxxx;
         endcase
     end
+
 endmodule
