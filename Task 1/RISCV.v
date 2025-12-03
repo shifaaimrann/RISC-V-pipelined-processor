@@ -1,4 +1,5 @@
 
+
 `timescale 1ns/1ps 
 
 module RISCV(
@@ -82,3 +83,4 @@ module RISCV(
     mux mux3(memtoreg, alu_result, readdata, writedata);
  
 endmodule
+
