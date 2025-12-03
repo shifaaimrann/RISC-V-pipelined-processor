@@ -1,0 +1,34 @@
+
+addi x10, x0, 256
+    addi x11, x0, 7
+    addi x5, x0, 0
+    addi x31, x11, -1
+    slt  x28, x5, x31
+    beq  x28, x0, done
+    addi x7, x5, 0
+    addi x6, x5, 1
+    slt  x28, x6, x11
+    beq  x28, x0, swap_step
+    slli x29, x7, 2
+    add  x29, x10, x29
+    lw   x8, 0(x29)
+    slli x30, x6, 2
+    add  x30, x10, x30
+    lw   x9, 0(x30)
+    blt  x9, x8, update_min
+    beq  x0, x0, next_j
+    addi x7, x6, 0
+    addi x6, x6, 1
+    beq  x0, x0, inner_loop
+    beq  x7, x5, next_i
+    slli x28, x5, 2
+    add  x28, x10, x28
+    slli x29, x7, 2
+    add  x29, x10, x29
+    lw   x30, 0(x28)
+    lw   x31, 0(x29)
+    sw   x31, 0(x28)
+    sw   x30, 0(x29)
+    addi x5, x5, 1
+    beq  x0, x0, outer_loop
+done:
