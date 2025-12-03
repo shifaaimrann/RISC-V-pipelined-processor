@@ -15,10 +15,8 @@ module EX_MEM(
     input [63:0] IDEX_PCBranch,
     input        ZeroFlag_EX,
     
-    // --- NEW INPUTS ---
-    input        bltflag_EX,   // Pass BLT flag from ALU
+    input        bltflag_EX,   // Passing BLT flag from ALU, because currently branching takes plae 
     input [3:0]  funct_EX,     // Pass Funct code to know if it's BEQ or BLT
-    // ------------------
 
     input [63:0] ALUResult_EX,
     input [63:0] WriteData_EX,
@@ -83,5 +81,6 @@ always @(posedge clk or posedge reset) begin
         EXMEM_Rd          <= IDEX_Rd;
     end
 end
+
 
 endmodule
