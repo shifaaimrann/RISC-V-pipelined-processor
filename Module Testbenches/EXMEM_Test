@@ -1,0 +1,92 @@
+`timescale 1ns / 1ps
+
+module EX_MEM_tb();
+reg clk;
+reg reset;
+
+// control signals from EX
+reg IDEX_Branch;
+reg IDEX_MemRead;
+reg IDEX_MemWrite;
+reg IDEX_MemtoReg;
+reg IDEX_RegWrite;
+
+// datapath signals from EX
+reg [63:0] IDEX_PCBranch;
+reg        ZeroFlag_EX;
+reg [63:0] ALUResult_EX;
+reg [63:0] WriteData_EX;
+reg [4:0]  IDEX_Rd;
+
+// outputs to MEM stage
+wire EXMEM_Branch;
+wire EXMEM_MemRead;
+wire EXMEM_MemWrite;
+wire EXMEM_MemtoReg;
+wire EXMEM_RegWrite;
+
+wire [63:0] EXMEM_PCBranch;
+wire        EXMEM_ZeroFlag;
+wire [63:0] EXMEM_ALUResult;
+wire [63:0] EXMEM_WriteData;
+wire [4:0]  EXMEM_Rd;
+
+// creating the EX_MEM pipeline register
+EX_MEM m1(clk,reset,
+          IDEX_Branch,IDEX_MemRead,IDEX_MemWrite,IDEX_MemtoReg,IDEX_RegWrite,
+          IDEX_PCBranch,ZeroFlag_EX,ALUResult_EX,WriteData_EX,IDEX_Rd,
+          EXMEM_Branch,EXMEM_MemRead,EXMEM_MemWrite,EXMEM_MemtoReg,EXMEM_RegWrite,
+          EXMEM_PCBranch,EXMEM_ZeroFlag,EXMEM_ALUResult,EXMEM_WriteData,EXMEM_Rd);
+
+initial begin
+    // initial values
+    clk = 1'b0;
+    reset = 1'b0;
+
+    IDEX_Branch = 0;
+    IDEX_MemRead = 0;
+    IDEX_MemWrite = 0;
+    IDEX_MemtoReg = 0;
+    IDEX_RegWrite = 0;
+
+    IDEX_PCBranch = 0;
+    ZeroFlag_EX = 0;
+    ALUResult_EX = 0;
+    WriteData_EX = 0;
+    IDEX_Rd = 0;
+
+    // apply reset
+    #10 reset = 1'b1;
+    #10 reset = 1'b0;
+
+    // sample EX stage values
+    #10 IDEX_Branch = 1;
+        IDEX_MemRead = 0;
+        IDEX_MemWrite = 1;   // store
+        IDEX_MemtoReg = 0;
+        IDEX_RegWrite = 0;
+
+        IDEX_PCBranch = 64'h40;
+        ZeroFlag_EX = 1;
+        ALUResult_EX = 64'd20;
+        WriteData_EX = 64'd5;
+        IDEX_Rd = 5'd10;
+
+    // second sample
+    #20 IDEX_Branch = 0;
+        IDEX_MemRead = 1;    // load
+        IDEX_MemWrite = 0;
+        IDEX_MemtoReg = 1;
+        IDEX_RegWrite = 1;
+
+        IDEX_PCBranch = 64'h80;
+        ZeroFlag_EX = 0;
+        ALUResult_EX = 64'd100;
+        WriteData_EX = 64'd12;
+        IDEX_Rd = 5'd3;
+end
+
+// clock generation
+always #10 clk = ~clk;
+
+endmodule

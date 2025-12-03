@@ -1,0 +1,70 @@
+`timescale 1ns / 1ps
+
+module MEM_WB_tb();
+reg clk;
+reg reset;
+
+// control inputs from MEM stage
+reg EXMEM_MemtoReg;
+reg EXMEM_RegWrite;
+
+// datapath inputs from MEM stage
+reg [63:0] ReadData_MEM;
+reg [63:0] ALUResult_MEM;
+reg [4:0]  EXMEM_Rd;
+
+// outputs to WB stage
+wire MEMWB_MemtoReg;
+wire MEMWB_RegWrite;
+wire [63:0] MEMWB_ReadData;
+wire [63:0] MEMWB_ALUResult;
+wire [4:0]  MEMWB_Rd;
+
+// creating the MEM_WB pipeline register
+MEM_WB w1(clk,reset,
+          EXMEM_MemtoReg,EXMEM_RegWrite,
+          ReadData_MEM,ALUResult_MEM,EXMEM_Rd,
+          MEMWB_MemtoReg,MEMWB_RegWrite,
+          MEMWB_ReadData,MEMWB_ALUResult,MEMWB_Rd);
+
+initial begin
+    // initial values
+    clk = 1'b0;
+    reset = 1'b0;
+
+    EXMEM_MemtoReg = 1'b0;
+    EXMEM_RegWrite = 1'b0;
+    ReadData_MEM   = 64'd0;
+    ALUResult_MEM  = 64'd0;
+    EXMEM_Rd       = 5'd0;
+
+    // apply reset
+    #10 reset = 1'b1;
+    #10 reset = 1'b0;
+
+    // sample 1: write ALU result to register file
+    #10 EXMEM_MemtoReg = 1'b0;       // select ALU result
+        EXMEM_RegWrite = 1'b1;       // enable write back
+        ReadData_MEM   = 64'd50;     // dummy value
+        ALUResult_MEM  = 64'd100;    // alu output
+        EXMEM_Rd       = 5'd5;       // write to x5
+
+    // sample 2: write memory data to register file
+    #20 EXMEM_MemtoReg = 1'b1;       // select mem data
+        EXMEM_RegWrite = 1'b1;
+        ReadData_MEM   = 64'd200;    // data from mem
+        ALUResult_MEM  = 64'd300;    // alu output (ignored)
+        EXMEM_Rd       = 5'd10;      // write to x10
+
+    // sample 3: no write to reg file
+    #20 EXMEM_MemtoReg = 1'b0;
+        EXMEM_RegWrite = 1'b0;       // wb disabled
+        ReadData_MEM   = 64'd400;
+        ALUResult_MEM  = 64'd500;
+        EXMEM_Rd       = 5'd15;
+end
+
+// clock generation
+always #10 clk = ~clk;
+
+endmodule
