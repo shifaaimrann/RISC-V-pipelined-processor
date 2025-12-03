@@ -61,8 +61,8 @@ module riscv_demo_tb;
     assign wb_rd               = uut.wb_rd;
     assign wb_final_write_data = uut.wb_final_write_data;
 
-    // Data Memory Array Elements (Addresses 256, 260, 264, 268, 272, 276, 280)
-    // Note: This assumes Little-Endian storage in the Data_Memory module
+    //Data Memory Array Elements (Addresses 256, 260, 264, 268, 272, 276, 280)
+
     assign array_element_0 = {uut.dmem.data_memory[256+3], uut.dmem.data_memory[256+2], uut.dmem.data_memory[256+1], uut.dmem.data_memory[256]};
     assign array_element_1 = {uut.dmem.data_memory[260+3], uut.dmem.data_memory[260+2], uut.dmem.data_memory[260+1], uut.dmem.data_memory[260]};
     assign array_element_2 = {uut.dmem.data_memory[264+3], uut.dmem.data_memory[264+2], uut.dmem.data_memory[264+1], uut.dmem.data_memory[264]};
