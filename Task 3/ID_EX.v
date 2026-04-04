@@ -19,7 +19,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 `timescale 1ns / 1ps
 module ID_EX(
-    input clk, input reset, input flush, // ENSURE THIS INPUT EXISTS
+    input clk, input reset, input flush, 
     input Branch, input MemRead, input MemWrite, input MemtoReg, input RegWrite, input ALUSrc, input [1:0] ALUOp,
     input [3:0] Funct, input [4:0] Rs1, input [4:0] Rs2, input [4:0] Rd,
     input [63:0] IFID_PCout, input [63:0] ReadData1, input [63:0] ReadData2, input [63:0] Imm,
