@@ -4,7 +4,6 @@ module MEM_WB(
     input clk,
     input reset,
 
-    // Control signals from MEM stage (latched from EX/MEM)
     input EXMEM_MemtoReg,// 1: write data to register from memory (ReadData)
                          // 0: write data to register from ALUResult
     input EXMEM_RegWrite,// 1: enable register file write in WB stage
@@ -25,21 +24,17 @@ module MEM_WB(
 
 always @(posedge clk or posedge reset) begin
     if (reset) begin
-        // Clear control so WB stage does nothing
         MEMWB_MemtoReg   <= 1'b0;
         MEMWB_RegWrite   <= 1'b0;
 
-        // Clear datapath so no random data gets written 
         MEMWB_ReadData   <= 64'd0;
         MEMWB_ALUResult  <= 64'd0;
         MEMWB_Rd         <= 5'd0;
     end
     else begin
-        // control from mem stage
         MEMWB_MemtoReg   <= EXMEM_MemtoReg;
         MEMWB_RegWrite   <= EXMEM_RegWrite;
 
-        // datapath signals from mem stage
         MEMWB_ReadData   <= ReadData_MEM;
         MEMWB_ALUResult  <= ALUResult_MEM;
         MEMWB_Rd         <= EXMEM_Rd;
